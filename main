@@ -5,28 +5,56 @@ from src.process_files import *
 from src.save_configs import *
 from src.bpnn import *
 
+
 def main():
     # 从JSON配置文件读取配置
     try:
         with open('bpnn_config', 'r') as f:
             config = json.load(f)
-        # 获取配置
-        dataDir = config['data_dir']
-        print("Data Directory:", dataDir)
-
-        # 读取所有数据文件并分成training和test数据集
-        data_files = getFileList(dataDir, ".csv", fileFullPath=True)
-        (X_train, y_train), (X_test, y_test) = prepare_data(data_files)
-
-        print("Training Data Shape:", X_train.shape)
-        print("Training Data: ", X_train[:10])
-        print("Testing Data Shape:", X_test.shape)
-        print("Test Data: ", X_test[:10])
-
     except FileNotFoundError:
         print("Error: config.json not found.  Please create the file.")
     except json.JSONDecodeError:
         print("Error: Invalid JSON format in config.json. Please check the file.")
+
+    # 获取配置
+    dataDir = config['data_dir']
+    print("Data Directory:", dataDir)
+    input_size = config['input_size']
+    output_size = config['output_size']
+    hidden_layer = config['hidden_layer']
+    hidden_size = config['hidden_size']
+    batch_size = config['batch_size']
+    learning_rate = config['learning_rate']
+    num_epochs = config['num_epochs']
+    full_scale = config['full_scale']
+    test_size = config['test_size']
+    random_state = config['random_state']
+
+    # 读取所有数据文件并分成training和test数据集
+    data_files = getFileList(dataDir, ".csv", fileFullPath=True)
+    train_loader, X_test, y_test = prepare_data(data_files, batch_size, test_size, random_state)
+
+    # 初始化模型
+    model, criterion, optimizer = BPNN.initialize_model(
+        input_size,
+        hidden_size,
+        hidden_layer,
+        output_size,
+        learning_rate
+    )
+
+    # 训练模型
+    BPNN.train(
+        model,
+        train_loader,
+        criterion,
+        optimizer,
+        num_epochs,
+        full_scale
+    )
+
+    # 测试模型
+    BPNN.test(model, X_test, y_test)
 
 
 if __name__ == '__main__':
