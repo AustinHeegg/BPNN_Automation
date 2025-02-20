@@ -1,8 +1,5 @@
-import sys
-import json
 from src.baseHJC import *
 from src.process_files import *
-from src.save_configs import *
 from src.bpnn import *
 
 
@@ -60,6 +57,7 @@ def main():
 
     # 测试模型
     BPNN.test(model, X_test, y_test)
+
 
 if __name__ == '__main__':
     main()

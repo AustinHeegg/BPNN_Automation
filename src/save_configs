@@ -1,6 +1,5 @@
 import torch
 import json
-import numpy as np
 
 
 def save_model_to_json(model, metrics=None, model_path='best_model.json'):
@@ -26,7 +25,6 @@ def save_model_to_json(model, metrics=None, model_path='best_model.json'):
 
     with open(model_path, 'w') as json_file:
         json.dump(model_data, json_file)
-
 
 
 def load_model_from_json(model, model_path='best_model.json'):
