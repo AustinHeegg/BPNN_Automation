@@ -1,7 +1,10 @@
 import torch
 import torch.nn as nn
+from matplotlib import pyplot as plt
+from setuptools.config.pyprojecttoml import validate
 from sklearn.metrics import mean_squared_error, r2_score
 from torch import optim
+from src.save_configs import *
 
 
 class BPNN(nn.Module):
@@ -14,7 +17,7 @@ class BPNN(nn.Module):
         self.fcs = nn.ModuleList()
 
         self.fcs.append(nn.Linear(input_size, hidden_size))
-        for _ in range(hidden_layer - 1):
+        for _ in range(hidden_layer):
             self.fcs.append(nn.Linear(hidden_size, hidden_size))
         self.fc_out = nn.Linear(hidden_size, output_size)
 
@@ -32,12 +35,15 @@ class BPNN(nn.Module):
         return model, criterion, optimizer
 
     @staticmethod
-    def train(model, train_loader, criterion, optimizer, num_epochs, full_scale):
+    def train_model(model, train_loader, criterion, optimizer, num_epochs, full_scale, val_loader=None):
         losses = []
+        best_loss = float('inf')
+        metrics = {}
+
         for epoch in range(num_epochs):
             epoch_loss = 0
             for batch_idx, (inputs, targets) in enumerate(train_loader):
-                # 前向传播
+                # 正向传播
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
 
@@ -48,21 +54,39 @@ class BPNN(nn.Module):
 
                 epoch_loss += loss.item()
 
-                # 每处理一个batch后打印状态
-                if (batch_idx + 1) % 100 == 0:  # 每100个batch打印一次
-                    print(
-                        f'Epoch {epoch + 1}/{num_epochs}, Batch {batch_idx + 1}/{len(train_loader)}, Loss: {loss.item():.4f}')
-
-            # 计算并记录平均损失
+            # 计算并记录平均损失以及相对精度
             epoch_loss /= len(train_loader)
             losses.append(epoch_loss)
-            # 计算相对精度
             relative_accuracy = 1 - (epoch_loss / full_scale)
 
+            # Validate and check for model saving
+            if val_loader is not None:
+                val_loss = BPNN.validate(model, val_loader, criterion)
+
+                # 计算性能指标
+                predictions, targets = [], []
+                with torch.no_grad():
+                    for inputs, target in val_loader:
+                        output = model(inputs)
+                        predictions.extend(output.numpy())
+                        targets.extend(target.numpy())
+
+                predictions = np.array(predictions)
+                targets = np.array(targets)
+                mse = mean_squared_error(targets, predictions)
+                r2 = r2_score(targets, predictions)
+
+                metrics['MSE'] = mse
+                metrics['R-Squared'] = r2
+                metrics['Training_Loss'] = epoch_loss
+
+                if val_loss < best_loss:
+                    best_loss = val_loss
+                    model_path = 'best_model.json'
+                    save_model_to_json(model, metrics, model_path)  # 保存模型为 JSON
+
             if (epoch + 1) % 1000 == 0:
-                print(
-                    f'Epoch [{epoch + 1}/{num_epochs}], Loss: {epoch_loss:.4f}, '
-                    f'Relative Accuracy: {relative_accuracy:.4f}')
+                print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {epoch_loss:.4f}', f'Relative Accuracy: {relative_accuracy:.4f}')
 
         return losses
 
@@ -83,3 +107,26 @@ class BPNN(nn.Module):
             print("Performance Metrics:")
             print(f"Mean Squared Error (MSE): {mse:.4f}")
             print(f"R-squared Score: {r2:.4f}")
+
+    @staticmethod
+    def validate(model, val_loader, criterion):
+        """计算在验证集上的损失"""
+        model.eval()  # 切换到评估模式
+        val_loss = 0
+        with torch.no_grad():
+            for inputs, targets in val_loader:
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
+                val_loss += loss.item()
+
+        # 返回平均损失
+        return val_loss / len(val_loader)
+
+    def loss_plot(losses):
+        plt.figure(figsize=(10, 5))
+        plt.plot(losses, label='Training Loss')
+        plt.title('Training Loss Over Epochs')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend()
+        plt.show()

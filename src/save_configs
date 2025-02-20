@@ -1,4 +1,55 @@
+import torch
+import json
 import numpy as np
 
-def config():
-    
+
+def save_model_to_json(model, metrics=None, model_path='best_model.json'):
+    model_weights = {}
+    model_bias = {}
+
+    # 遍历模型的所有参数并转换为可序列化格式
+    for name, param in model.named_parameters():
+        if 'bias' in name:  # 如果是偏置参数
+            model_bias[name] = param.data.numpy().tolist()  # 转换为列表
+        else:  # 否则是权重参数
+            model_weights[name] = param.data.numpy().tolist()  # 转换为列表
+
+    if metrics is None:
+        metrics = {}
+
+    # 整合所有数据
+    model_data = {
+        "model_weights": model_weights,
+        "model_bias": model_bias,
+        "metrics": metrics,
+    }
+
+    with open(model_path, 'w') as json_file:
+        json.dump(model_data, json_file)
+
+
+
+def load_model_from_json(model, model_path='best_model.json'):
+    with open(model_path, 'r') as json_file:
+        model_data = json.load(json_file)
+
+    # 加载模型权重
+    model_weights = model_data.get("model_weights", {})
+    for name, param in model.named_parameters():
+        if name in model_weights:
+            param.data = torch.tensor(model_weights[name])  # 转换为 Tensor
+
+    # 加载模型偏置
+    model_bias = model_data.get("model_bias", {})
+    for name, param in model.named_parameters():
+        if name in model_bias:
+            param.data = torch.tensor(model_bias[name])  # 转换为 Tensor
+
+    # 可以选择加载其他信息，例如指标和数据集路径
+    metrics = model_data.get("metrics", {})
+    dataset_path = model_data.get("dataset_path", "")
+
+    model.eval()
+    print(f'Model weights and biases loaded from {model_path}')
+    print(f'Metrics: {metrics}')
+    print(f'Dataset path: {dataset_path}')
