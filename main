@@ -3,7 +3,7 @@ import json
 from src.baseHJC import *
 from src.process_files import *
 from src.save_configs import *
-from src.bpnn_forward import *
+from src.bpnn import *
 
 def main():
     # 从JSON配置文件读取配置
