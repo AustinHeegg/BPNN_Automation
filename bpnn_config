@@ -1,0 +1,12 @@
+{
+  "data_dir": "D:/Code/code-per/BP/data/A+B/5/Scanning/",
+
+  "input_node": 2,
+  "output_node": 2,
+  "hidden_layer": 3,
+  "hidden_notes_for_each_layer": 8,
+
+  "batch_size": 32,
+  "learning_rate": 0.01,
+  "num_epochs": 10
+}

@@ -1,0 +1,38 @@
+import numpy as np
+import torch
+from sklearn.model_selection import train_test_split
+from src.baseHJC import readColumn
+
+
+# 读取并修改column内容
+def getAllFfmData(files):
+    xlist = np.empty(0)
+    ylist = np.empty(0)
+    ch1list = np.empty(0)
+    ch2list = np.empty(0)
+    for f in files:
+        # print(f)
+        xlist = np.append(xlist, readColumn(f, 0, rowSkip=1))
+        ylist = np.append(ylist, readColumn(f, 1, rowSkip=1))
+        ch1list = np.append(ch1list, readColumn(f, 2, rowSkip=1))
+        ch2list = np.append(ch2list, readColumn(f, 3, rowSkip=1))
+
+    return xlist, ylist, ch1list, ch2list
+
+
+def prepare_data(data_files):
+    xlist, ylist, ch1list, ch2list = getAllFfmData(data_files)
+
+    # 将训练和测试数据转换为张量
+    X = torch.tensor(np.column_stack((xlist, ylist)).astype(np.float32))
+    y = torch.tensor(np.column_stack((ch1list, ch2list)).astype(np.float32))
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # 将数据转换为 PyTorch 张量
+    X_train = torch.tensor(X_train)
+    y_train = torch.tensor(y_train)
+    X_test = torch.tensor(X_test)
+    y_test = torch.tensor(y_test)
+
+    return (X_train, y_train), (X_test, y_test)

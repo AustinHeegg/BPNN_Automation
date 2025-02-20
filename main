@@ -1,0 +1,33 @@
+import sys
+import json
+from src.baseHJC import *
+from src.process_files import *
+from src.save_configs import *
+from src.bpnn_forward import *
+
+def main():
+    # 从JSON配置文件读取配置
+    try:
+        with open('bpnn_config', 'r') as f:
+            config = json.load(f)
+        # 获取配置
+        dataDir = config['data_dir']
+        print("Data Directory:", dataDir)
+
+        # 读取所有数据文件并分成training和test数据集
+        data_files = getFileList(dataDir, ".csv", fileFullPath=True)
+        (X_train, y_train), (X_test, y_test) = prepare_data(data_files)
+
+        print("Training Data Shape:", X_train.shape)
+        print("Training Data: ", X_train[:10])
+        print("Testing Data Shape:", X_test.shape)
+        print("Test Data: ", X_test[:10])
+
+    except FileNotFoundError:
+        print("Error: config.json not found.  Please create the file.")
+    except json.JSONDecodeError:
+        print("Error: Invalid JSON format in config.json. Please check the file.")
+
+
+if __name__ == '__main__':
+    main()
