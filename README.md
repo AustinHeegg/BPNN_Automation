@@ -3,7 +3,8 @@
 自动化的神经网络正向传播
 
 bpnn_config为可改变的输入，根据需求进行修改。
-data_dir: 训练数据所在文件夹
+
+data_dir: 训练数据所在文件夹\n
 input_size: 输入节点数,
 output_size: 输出节点数,
 hidden_layer: 隐藏层层数,
