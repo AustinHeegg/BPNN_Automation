@@ -16,6 +16,7 @@ def main():
     # 获取配置
     dataDir = config['data_dir']
     print("Data Directory:", dataDir)
+    select_files = config['select_files_or_not']
     input_size = config['input_size']
     output_size = config['output_size']
     hidden_layer = config['hidden_layer']
@@ -29,7 +30,11 @@ def main():
 
     # 读取所有数据文件并分成training和test数据集
     data_files = getFileList(dataDir, ".csv", fileFullPath=True)
-    train_loader, test_loader, X_test, y_test = prepare_data(data_files, batch_size, test_size, random_state)
+    if select_files == 1:
+        selected_files = user_select_files(data_files)
+    else:
+        selected_files = data_files
+    train_loader, test_loader, X_test, y_test = prepare_data(selected_files, batch_size, test_size, random_state)
 
     # 初始化模型
     model, criterion, optimizer = BPNN.initialize_model(

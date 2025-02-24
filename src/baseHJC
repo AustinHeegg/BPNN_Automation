@@ -30,6 +30,26 @@ def getFileList(path, filter='', fileFullPath=False):
 
     return files
 
+
+def user_select_files(available_files):
+    print("可用的文件列表:")
+    for idx, file in enumerate(available_files):
+        print(f"{idx}: {file}")
+
+    selected_indexes = input("请输入要选择的文件索引（以逗号分隔，例如 '0,1'）: ")
+    try:
+        selected_indexes = list(map(int, selected_indexes.split(',')))
+        selected_files = [available_files[i] for i in selected_indexes if 0 <= i < len(available_files)]
+
+        if selected_files:
+            return selected_files
+        else:
+            print("未选择有效文件。")
+            return []
+    except ValueError:
+        print("请输入有效的索引。")
+        return []
+
 def readColumn(filePath, iColumn, rowSkip=0, keyStr='', sep=''):
     f = open(filePath, 'r')
     dataList = []

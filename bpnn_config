@@ -1,5 +1,6 @@
 {
   "data_dir": "D:/Code/code-per/BP/data/A+B/5/Scanning_all/",
+  "select_files_or_not": 1,
 
   "input_size": 2,
   "output_size": 2,
