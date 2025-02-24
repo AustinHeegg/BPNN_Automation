@@ -6,27 +6,24 @@ from src.baseHJC import readColumn
 
 
 # 读取并修改column内容
-def getAllFfmData(files):
-    xlist = np.empty(0)
-    ylist = np.empty(0)
-    ch1list = np.empty(0)
-    ch2list = np.empty(0)
+def getAllFfmData(files, selected_columns, rowSkip=1):
+    data_lists = [[] for _ in selected_columns]
+
     for f in files:
-        # print(f)
-        xlist = np.append(xlist, readColumn(f, 0, rowSkip=1))
-        ylist = np.append(ylist, readColumn(f, 1, rowSkip=1))
-        ch1list = np.append(ch1list, readColumn(f, 2, rowSkip=1))
-        ch2list = np.append(ch2list, readColumn(f, 3, rowSkip=1))
+        for idx, col in enumerate(selected_columns):
+            data = readColumn(f, col, rowSkip=rowSkip)
+            data_lists[idx].extend(data)
 
-    return xlist, ylist, ch1list, ch2list
+    data_arrays = [np.array(data) for data in data_lists]
+    return data_arrays
 
 
-def prepare_data(data_files, batch_size, test_size, random_state):
-    xlist, ylist, ch1list, ch2list = getAllFfmData(data_files)
+def prepare_data(data_files, batch_size, test_size, random_state, selected_input_columns, selected_output_columns, rowSkip):
+    data_arrays = getAllFfmData(data_files, selected_input_columns + selected_output_columns, rowSkip)
 
     # 将训练和测试数据转换为张量
-    X = torch.tensor(np.column_stack((xlist, ylist)).astype(np.float32))
-    y = torch.tensor(np.column_stack((ch1list, ch2list)).astype(np.float32))
+    X = torch.tensor(np.column_stack([data_arrays[i] for i in selected_input_columns]).astype(np.float32))
+    y = torch.tensor(np.column_stack([data_arrays[i] for i in selected_output_columns]).astype(np.float32))
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 

@@ -1,6 +1,9 @@
 {
-  "data_dir": "D:/Code/code-per/BP/data/A+B/5/Scanning_all/",
-  "select_files_or_not": 1,
+  "data_dir": "D:/Code/code-per/BP/data/A+B/5/Scanning/",
+  "select_files_or_not": 0,
+  "rowSkip": 1,
+  "selected_input_columns": [0, 1],
+  "selected_output_columns": [2, 3],
 
   "input_size": 2,
   "output_size": 2,
@@ -9,9 +12,8 @@
 
   "batch_size": 32,
   "learning_rate": 0.01,
-  "num_epochs": 10000,
+  "num_epochs": 15000,
   "full_scale": 6.4,
-
   "test_size": 0.2,
   "random_state": 42
 }

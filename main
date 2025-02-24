@@ -17,6 +17,9 @@ def main():
     dataDir = config['data_dir']
     print("Data Directory:", dataDir)
     select_files = config['select_files_or_not']
+    rowSkip = config['rowSkip']
+    selected_input_columns = config['selected_input_columns']
+    selected_output_columns = config['selected_output_columns']
     input_size = config['input_size']
     output_size = config['output_size']
     hidden_layer = config['hidden_layer']
@@ -34,7 +37,8 @@ def main():
         selected_files = user_select_files(data_files)
     else:
         selected_files = data_files
-    train_loader, test_loader, X_test, y_test = prepare_data(selected_files, batch_size, test_size, random_state)
+    train_loader, test_loader, X_test, y_test = prepare_data(selected_files, batch_size, test_size, random_state,
+                                                             selected_input_columns, selected_output_columns, rowSkip)
 
     # 初始化模型
     model, criterion, optimizer = BPNN.initialize_model(
