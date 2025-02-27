@@ -18,7 +18,8 @@ def getAllFfmData(files, selected_columns, rowSkip=1):
     return data_arrays
 
 
-def prepare_data(data_files, batch_size, test_size, random_state, selected_input_columns, selected_output_columns, rowSkip):
+def prepare_data(data_files, batch_size, test_size, random_state, selected_input_columns, selected_output_columns,
+                 rowSkip):
     data_arrays = getAllFfmData(data_files, selected_input_columns + selected_output_columns, rowSkip)
 
     # 将训练和测试数据转换为张量

@@ -60,7 +60,6 @@ class BPNN(nn.Module):
 
             # Validate and check for model saving
             if val_loader is not None:
-                val_loss = BPNN.validate(model, val_loader, criterion)
 
                 # 计算性能指标
                 predictions, targets = [], []
@@ -78,11 +77,6 @@ class BPNN(nn.Module):
                 metrics['MSE'] = mse
                 metrics['R-Squared'] = r2
                 metrics['Training_Loss'] = epoch_loss
-
-                if val_loss < best_loss:
-                    best_loss = val_loss
-                    model_path = 'best_model.json'
-                    save_model_to_json(model, metrics, model_path)  # 保存模型为 JSON
 
             if (epoch + 1) % 1000 == 0:
                 print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {epoch_loss:.4f}',
@@ -108,19 +102,7 @@ class BPNN(nn.Module):
             print(f"Mean Squared Error (MSE): {mse:.4f}")
             print(f"R-squared Score: {r2:.4f}")
 
-    @staticmethod
-    def validate(model, val_loader, criterion):
-        """计算在验证集上的损失"""
-        model.eval()  # 切换到评估模式
-        val_loss = 0
-        with torch.no_grad():
-            for inputs, targets in val_loader:
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
-                val_loss += loss.item()
-
-        # 返回平均损失
-        return val_loss / len(val_loader)
+            return mse
 
     def loss_plot(losses):
         plt.figure(figsize=(10, 5))

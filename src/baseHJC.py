@@ -2,6 +2,7 @@ import numpy as np
 import os
 import re
 
+
 def is_float(element):
     if isinstance(element, list) or isinstance(element, dict) or isinstance(element, tuple):
         return False
@@ -11,6 +12,7 @@ def is_float(element):
         return True
     except ValueError:
         return False
+
 
 def getFileList(path, filter='', fileFullPath=False):
     fileList = []
@@ -49,6 +51,7 @@ def user_select_files(available_files):
     except ValueError:
         print("请输入有效的索引。")
         return []
+
 
 def readColumn(filePath, iColumn, rowSkip=0, keyStr='', sep=''):
     f = open(filePath, 'r')
