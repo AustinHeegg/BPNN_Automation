@@ -24,6 +24,9 @@ def main():
     output_size = config['output_size']
     hidden_layer = config['hidden_layer']
     hidden_size = config['hidden_size']
+    activation_function = config['activation_function']
+    criterion_type = config['criterion_type']
+    optimizer_type = config['optimizer_type']
     batch_size = config['batch_size']
     learning_rate = config['learning_rate']
     num_epochs = config['num_epochs']
@@ -46,7 +49,10 @@ def main():
         hidden_size,
         hidden_layer,
         output_size,
-        learning_rate
+        learning_rate,
+        activation_function,
+        criterion_type,
+        optimizer_type
     )
 
     # 训练模型

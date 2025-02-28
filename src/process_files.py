@@ -29,12 +29,25 @@ def prepare_data(data_files, batch_size, test_size, random_state, selected_input
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
     # 将数据转换为 PyTorch 张量
-    X_train = torch.tensor(X_train, dtype=torch.float32)
-    y_train = torch.tensor(y_train, dtype=torch.float32)
-    X_test = torch.tensor(X_test, dtype=torch.float32)
-    y_test = torch.tensor(y_test, dtype=torch.float32)
-    print("X_train shape:", X_train.shape)
-    print("X_test shape:", X_test.shape)
+    if not isinstance(X_train, torch.Tensor):
+        X_train = torch.tensor(X_train, dtype=torch.float32)
+    else:
+        X_train = X_train.clone().detach()
+
+    if not isinstance(y_train, torch.Tensor):
+        y_train = torch.tensor(y_train, dtype=torch.float32)
+    else:
+        y_train = y_train.clone().detach()
+
+    if not isinstance(X_test, torch.Tensor):
+        X_test = torch.tensor(X_test, dtype=torch.float32)
+    else:
+        X_test = X_test.clone().detach()
+
+    if not isinstance(y_test, torch.Tensor):
+        y_test = torch.tensor(y_test, dtype=torch.float32)
+    else:
+        y_test = y_test.clone().detach()
 
     # 创建创建数据加载器
     train_dataset = data.TensorDataset(X_train, y_train)

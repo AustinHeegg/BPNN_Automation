@@ -7,7 +7,7 @@ from src.save_configs import *
 
 
 class BPNN(nn.Module):
-    def __init__(self, input_size, hidden_size, hidden_layer, output_size):
+    def __init__(self, input_size, hidden_size, hidden_layer, output_size, activation_function="sigmoid"):
         super(BPNN, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -20,17 +20,58 @@ class BPNN(nn.Module):
             self.fcs.append(nn.Linear(hidden_size, hidden_size))
         self.fc_out = nn.Linear(hidden_size, output_size)
 
+        self.activation = self.get_activation(activation_function)
+        print(f"Activation function used: {activation_function}")
+
+    def get_activation(self, activation_function):
+        activation_functions = {
+            "sigmoid": torch.sigmoid,
+            "tanh": torch.tanh,
+            "relu": torch.relu,
+            "leaky_relu": nn.LeakyReLU,
+            "elu": nn.ELU,
+            "selu": nn.SELU,
+        }
+
+        if activation_function in activation_functions:
+            return activation_functions[activation_function]
+        else:
+            raise ValueError("Activation function is not supported!")
+
     def forward(self, x):
         for i in range(self.hidden_layer):
-            x = torch.sigmoid(self.fcs[i](x))
+            x = self.activation(self.fcs[i](x))
         x = self.fc_out(x)
         return x
 
     @staticmethod
-    def initialize_model(input_size, hidden_size, output_size, hidden_layers, learning_rate):
-        model = BPNN(input_size, hidden_size, output_size, hidden_layers)
-        criterion = nn.MSELoss()
-        optimizer = optim.SGD(model.parameters(), lr=learning_rate)
+    def get_criterion(criterion_type):
+        # 根据类型选择损失函数
+        if criterion_type == 'mse':
+            return nn.MSELoss()
+        elif criterion_type == 'cross_entropy':
+            return nn.CrossEntropyLoss()
+        else:
+            raise ValueError("Criterion type not supported!")
+
+    @staticmethod
+    def get_optimizer(optimizer_type, model, learning_rate):
+        # 根据类型选择优化器
+        if optimizer_type == 'sgd':
+            return optim.SGD(model.parameters(), lr=learning_rate)
+        elif optimizer_type == 'adam':
+            return optim.Adam(model.parameters(), lr=learning_rate)
+        else:
+            raise ValueError("Optimizer type not supported!")
+
+    @staticmethod
+    def initialize_model(input_size, hidden_size, output_size, hidden_layers, learning_rate, activation_function,
+                         criterion_type='mse', optimizer_type='sgd'):
+        model = BPNN(input_size, hidden_size, output_size, hidden_layers, activation_function)
+        criterion = BPNN.get_criterion(criterion_type)
+        optimizer = BPNN.get_optimizer(optimizer_type, model, learning_rate)
+        print(f'Criterion type: {criterion_type}')
+        print(f'Optimizer type: {optimizer_type}')
         return model, criterion, optimizer
 
     @staticmethod

@@ -9,6 +9,9 @@
   "output_size": 2,
   "hidden_layer": 3,
   "hidden_size": 8,
+  "activation_function": "relu",
+  "criterion_type":  "mse",
+  "optimizer_type": "sgd",
 
   "batch_size": 32,
   "learning_rate": 0.01,
