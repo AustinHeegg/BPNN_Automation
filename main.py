@@ -74,7 +74,7 @@ def main():
     mse = BPNN.test(model, X_test, y_test)
 
     # 保存参数
-    model_path = 'best_model.json'
+    model_path = f"bpnn_param_{input_size}input_{output_size}output_{hidden_layer}hidden.json"
     metrics = {
         'MSE': mse,
     }

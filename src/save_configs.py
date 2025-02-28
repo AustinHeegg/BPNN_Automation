@@ -21,7 +21,7 @@ def generate_layer_names(input_size, output_size, hidden_layers, hidden_size):
     return layer_names
 
 
-def save_model_to_json(model, metrics=None, model_path='best_model.json', config=None):
+def save_model_to_json(model, metrics=None, model_path=None, config=None):
     if config is None:
         raise ValueError("Configuration must be provided.")
 
