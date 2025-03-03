@@ -29,6 +29,7 @@ def save_model_to_json(model, metrics=None, model_path=None, config=None):
     output_size = config['output_size']
     hidden_layers = config['hidden_layer']
     hidden_size = config['hidden_size']
+    activation_function = config['activation_function']
 
     # 生成层名称
     layer_names = generate_layer_names(input_size, output_size, hidden_layers, hidden_size)
@@ -40,16 +41,28 @@ def save_model_to_json(model, metrics=None, model_path=None, config=None):
                 "InputSize": input_size,
                 "OutputSize": output_size,
                 "HiddenLayer": hidden_layers,
-                "HiddenSize": hidden_size
+                "HiddenSize": hidden_size,
+                "ActivationFuction": activation_function,
             },
 
-            "ModelWeightLayer_Input": [],
-            **{name: [] for name in layer_names["weight_layers"][1:-1]},
-            "ModelWeightLayer_Output": [],
-            #
-            "ModelBiasLayer_Input": [],
-            **{name: [] for name in layer_names["bias_layers"][1:-1]},
-            "ModelBiasLayer_Output": []
+            # "ModelWeightLayer_Input": [],
+            # **{name: [] for name in layer_names["weight_layers"][1:-1]},
+            # "ModelWeightLayer_Output": [],
+            # #
+            # "ModelBiasLayer_Input": [],
+            # **{name: [] for name in layer_names["bias_layers"][1:-1]},
+            # "ModelBiasLayer_Output": []
+
+            "Weight": [
+                [],  # 输入层权重
+                [],  # 隐藏层权重列表
+                []  # 输出层权重
+            ],
+            "Bias": [
+                [],  # 输入层偏置
+                [],  # 隐藏层偏置列表
+                []  # 输出层偏置
+            ],
         },
         "#Metrics": {
             "MSE": metrics.get('MSE'),
@@ -59,33 +72,48 @@ def save_model_to_json(model, metrics=None, model_path=None, config=None):
     # 遍历模型的所有参数并填充模型权重和偏置
     for name, param in model.named_parameters():
         param_data = param.data.numpy().tolist()  # 转换为可序列化格式
-        # print(f"Parameter name: {name}, Parameter value: {param.data.numpy()}")
+        print(f"Parameter name: {name}, Parameter value: {param.data.numpy()}")
+
+        # if 'bias' in name:
+        #     if '0' in name:
+        #         model_data["BpNeuralNetworkModelPara"]["ModelBiasLayer_Input"] = param_data
+        #     elif 'out' in name:
+        #         model_data["BpNeuralNetworkModelPara"]["ModelBiasLayer_Output"] = param_data
+        #     else:
+        #         # 获取层索引
+        #         layer_index = name.split('.')[1]
+        #         if layer_index == '1':
+        #             model_data["BpNeuralNetworkModelPara"]["ModelBiasLayer_0"] = param_data
+        #         else:
+        #             model_data["BpNeuralNetworkModelPara"][
+        #                 f"ModelBiasLayer_{int(layer_index) - 1}"] = param_data
+        # else:
+        #     if '0' in name:
+        #         model_data["BpNeuralNetworkModelPara"]["ModelWeightLayer_Input"] = param_data
+        #     elif 'out' in name:
+        #         model_data["BpNeuralNetworkModelPara"]["ModelWeightLayer_Output"] = param_data
+        #     else:
+        #         # 获取层索引
+        #         layer_index = name.split('.')[1]
+        #         if layer_index == '1':
+        #             model_data["BpNeuralNetworkModelPara"]["ModelWeightLayer_0"] = param_data
+        #         else:
+        #             model_data["BpNeuralNetworkModelPara"][f"ModelWeightLayer_{int(layer_index) - 1}"] = param_data
 
         if 'bias' in name:
-            if '0' in name:
-                model_data["BpNeuralNetworkModelPara"]["ModelBiasLayer_Input"] = param_data
-            elif 'out' in name:
-                model_data["BpNeuralNetworkModelPara"]["ModelBiasLayer_Output"] = param_data
-            else:
-                # 获取层索引
-                layer_index = name.split('.')[1]
-                if layer_index == '1':
-                    model_data["BpNeuralNetworkModelPara"]["ModelBiasLayer_0"] = param_data
-                else:
-                    model_data["BpNeuralNetworkModelPara"][
-                        f"ModelBiasLayer_{int(layer_index) - 1}"] = param_data
+            if '0' in name:  # 输入层偏置
+                model_data["BpNeuralNetworkModelPara"]["Bias"][0] = param_data
+            elif 'out' in name:  # 输出层偏置
+                model_data["BpNeuralNetworkModelPara"]["Bias"][2] = param_data
+            else:  # 隐藏层偏置
+                model_data["BpNeuralNetworkModelPara"]["Bias"][1].append(param_data)
         else:
-            if '0' in name:
-                model_data["BpNeuralNetworkModelPara"]["ModelWeightLayer_Input"] = param_data
-            elif 'out' in name:
-                model_data["BpNeuralNetworkModelPara"]["ModelWeightLayer_Output"] = param_data
-            else:
-                # 获取层索引
-                layer_index = name.split('.')[1]
-                if layer_index == '1':
-                    model_data["BpNeuralNetworkModelPara"]["ModelWeightLayer_0"] = param_data
-                else:
-                    model_data["BpNeuralNetworkModelPara"][f"ModelWeightLayer_{int(layer_index) - 1}"] = param_data
+            if '0' in name:  # 输入层权重
+                model_data["BpNeuralNetworkModelPara"]["Weight"][0] = param_data
+            elif 'out' in name:  # 输出层权重
+                model_data["BpNeuralNetworkModelPara"]["Weight"][2] = param_data
+            else:  # 隐藏层权重
+                model_data["BpNeuralNetworkModelPara"]["Weight"][1].append(param_data)
 
     # 写入 JSON 文件
     with open(model_path, 'w') as json_file:
