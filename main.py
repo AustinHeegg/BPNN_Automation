@@ -23,8 +23,8 @@ def main():
     input_size = config['input_size']
     output_size = config['output_size']
     hidden_layer = config['hidden_layer']
-    hidden_size = config['hidden_size']
-    activation_function = config['activation_function']
+    hidden_nodes = config['hidden_nodes']
+    activation_functions = config['activation_function']
     criterion_type = config['criterion_type']
     optimizer_type = config['optimizer_type']
     batch_size = config['batch_size']
@@ -46,11 +46,11 @@ def main():
     # 初始化模型
     model, criterion, optimizer = BPNN.initialize_model(
         input_size,
-        hidden_size,
         hidden_layer,
+        hidden_nodes,
         output_size,
         learning_rate,
-        activation_function,
+        activation_functions,
         criterion_type,
         optimizer_type
     )

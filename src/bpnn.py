@@ -7,30 +7,33 @@ from src.save_configs import *
 
 
 class BPNN(nn.Module):
-    def __init__(self, input_size, hidden_size, hidden_layer, output_size, activation_function="sigmoid"):
+    def __init__(self, input_size, hidden_layer, hidden_nodes, output_size, activation_functions):
         super(BPNN, self).__init__()
         self.input_size = input_size
-        self.hidden_size = hidden_size
         self.hidden_layer = hidden_layer
+        self.hidden_nodes = hidden_nodes
         self.output_size = output_size
+        self.activations = []
         self.fcs = nn.ModuleList()
 
-        self.fcs.append(nn.Linear(input_size, hidden_size))
-        for _ in range(hidden_layer):
-            self.fcs.append(nn.Linear(hidden_size, hidden_size))
-        self.fc_out = nn.Linear(hidden_size, output_size)
+        self.fcs.append(nn.Linear(input_size, hidden_nodes[0]))
+        self.activations.append(self.get_activation(activation_functions[0]))
+        for i in range(1, hidden_layer):
+            self.fcs.append(nn.Linear(hidden_nodes[i - 1], hidden_nodes[i]))
+            self.activations.append(self.get_activation(activation_functions[i]))
+        self.fc_out = nn.Linear(hidden_nodes[-1], output_size)
+        self.activations.append(self.get_activation(activation_functions[-1]))
 
-        self.activation = self.get_activation(activation_function)
-        print(f"Activation function used: {activation_function}")
+        print(f"Activation function used: {activation_functions}")
 
     def get_activation(self, activation_function):
         activation_functions = {
-            "sigmoid": torch.sigmoid,
-            "tanh": torch.tanh,
-            "relu": torch.relu,
-            "leaky_relu": nn.LeakyReLU,
-            "elu": nn.ELU,
-            "selu": nn.SELU,
+            "Sigmoid": torch.sigmoid,
+            "Tanh": torch.tanh,
+            "ReLU": torch.relu,
+            "Leaky_ReLU": nn.LeakyReLU,
+            "ELU": nn.ELU,
+            "SELU": nn.SELU,
         }
 
         if activation_function in activation_functions:
@@ -40,7 +43,7 @@ class BPNN(nn.Module):
 
     def forward(self, x):
         for i in range(self.hidden_layer):
-            x = self.activation(self.fcs[i](x))
+            x = self.activations[i](self.fcs[i](x))
         x = self.fc_out(x)
         return x
 
@@ -65,9 +68,9 @@ class BPNN(nn.Module):
             raise ValueError("Optimizer type not supported!")
 
     @staticmethod
-    def initialize_model(input_size, hidden_size, output_size, hidden_layers, learning_rate, activation_function,
+    def initialize_model(input_size, hidden_layer, hidden_nodes, output_size, learning_rate, activation_function,
                          criterion_type='mse', optimizer_type='sgd'):
-        model = BPNN(input_size, hidden_size, output_size, hidden_layers, activation_function)
+        model = BPNN(input_size, hidden_layer, hidden_nodes, output_size, activation_function)
         criterion = BPNN.get_criterion(criterion_type)
         optimizer = BPNN.get_optimizer(optimizer_type, model, learning_rate)
         print(f'Criterion type: {criterion_type}')
