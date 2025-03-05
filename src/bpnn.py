@@ -22,7 +22,7 @@ class BPNN(nn.Module):
             self.fcs.append(nn.Linear(hidden_nodes[i - 1], hidden_nodes[i]))
             self.activations.append(self.get_activation(activation_functions[i]))
         self.fc_out = nn.Linear(hidden_nodes[-1], output_size)
-        self.activations.append(self.get_activation(activation_functions[-1]))
+        # self.activations.append(self.get_activation(activation_functions[-1]))
 
         print(f"Activation function used: {activation_functions}")
 
@@ -80,11 +80,10 @@ class BPNN(nn.Module):
     @staticmethod
     def train_model(model, train_loader, criterion, optimizer, num_epochs, full_scale, val_loader=None):
         losses = []
-        best_loss = float('inf')
-        metrics = {}
 
         for epoch in range(num_epochs):
             epoch_loss = 0
+            model.train()
             for batch_idx, (inputs, targets) in enumerate(train_loader):
                 # 正向传播
                 outputs = model(inputs)
@@ -101,26 +100,6 @@ class BPNN(nn.Module):
             epoch_loss /= len(train_loader)
             losses.append(epoch_loss)
             relative_accuracy = 1 - (epoch_loss / full_scale)
-
-            # Validate and check for model saving
-            if val_loader is not None:
-
-                # 计算性能指标
-                predictions, targets = [], []
-                with torch.no_grad():
-                    for inputs, target in val_loader:
-                        output = model(inputs)
-                        predictions.extend(output.numpy())
-                        targets.extend(target.numpy())
-
-                predictions = np.array(predictions)
-                targets = np.array(targets)
-                mse = mean_squared_error(targets, predictions)
-                r2 = r2_score(targets, predictions)
-
-                metrics['MSE'] = mse
-                metrics['R-Squared'] = r2
-                metrics['Training_Loss'] = epoch_loss
 
             if (epoch + 1) % 1000 == 0:
                 print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {epoch_loss:.4f}',
