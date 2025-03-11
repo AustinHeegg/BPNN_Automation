@@ -1,5 +1,6 @@
 {
-  "data_dir": "D:/Code/code-per/BP/data/A+B/886/Scanning/",
+  "tooling_number": 738,
+  "data_dir": "D:/Code/code-per/BP/data/A+B/738/Scanning",
   "select_files_or_not": 0,
   "rowSkip": 1,
   "selected_input_columns": [0, 1],
@@ -9,7 +10,7 @@
   "output_size": 2,
   "hidden_layer": 3,
   "hidden_nodes": [8, 8, 8],
-  "activation_function": ["Sigmoid", "Sigmoid", "Sigmoid", "Sigmoid"],
+  "activation_function": ["Sigmoid", "Sigmoid", "Sigmoid"],
   "criterion_type":  "mse",
   "optimizer_type": "sgd",
 

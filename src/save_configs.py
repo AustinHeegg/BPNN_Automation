@@ -41,28 +41,26 @@ def save_model_to_json(model, metrics=None, model_path=None, config=None):
     model_data = {
         "model_param": {
             "layer_num":layer_count,
-            "layer_node_num":layer_node_num,
+            "layer_neuron_num":layer_node_num,
             "activation_function":activation_functions,
-        },
-        "model_coff": {
-
-        },
-        "#model_metrics": {
-            "mse": metrics.get('MSE'),
+            "model_coff": {},
+            "#model_metrics": {
+                "mse": metrics.get('MSE'),
+            }
         }
     }
 
     # 动态生成层结构
     for i in range(hidden_layers):
         layer_name = f"bp_{i + 1}_layer"
-        model_data["model_coff"][layer_name] = {
+        model_data["model_param"]["model_coff"][layer_name] = {
             "weight": [],
             "bias": []
         }
 
     # 输出层的名称
     output_layer_name = f"bp_{hidden_layers + 1}_layer"
-    model_data["model_coff"][output_layer_name] = {
+    model_data["model_param"]["model_coff"][output_layer_name] = {
         "weight": [],
         "bias": []
     }
@@ -70,27 +68,26 @@ def save_model_to_json(model, metrics=None, model_path=None, config=None):
     # 遍历模型的所有参数并填充模型权重和偏置
     for name, param in model.named_parameters():
         param_data = param.data.numpy().tolist()  # 转换为可序列化格式
-        print(f"Parameter name: {name}, Parameter value: {param.data.numpy()}")
-
+        # print(f"Parameter name: {name}, Parameter value: {param.data.numpy()}")
 
         if 'bias' in name:
             # 匹配层次
             if '0' in name:  # 输入层偏置
-                model_data["model_coff"]["bp_1_layer"]["bias"] = param_data
+                model_data["model_param"]["model_coff"]["bp_1_layer"]["bias"] = param_data
             elif 'out' in name:  # 输出层偏置
-                model_data["model_coff"][output_layer_name]["bias"] = param_data
+                model_data["model_param"]["model_coff"][output_layer_name]["bias"] = param_data
             else:  # 隐藏层偏置
                 layer_index = int(name.split('.')[1])  # 索引修正
-                model_data["model_coff"][f"bp_{layer_index + 1}_layer"]["bias"] = param_data
+                model_data["model_param"]["model_coff"][f"bp_{layer_index + 1}_layer"]["bias"] = param_data
         else:  # 权重
             if 'weight' in name:
                 if '0' in name:  # 输入层权重
-                    model_data["model_coff"]["bp_1_layer"]["weight"] = param_data
+                    model_data["model_param"]["model_coff"]["bp_1_layer"]["weight"] = param_data
                 elif 'out' in name:  # 输出层权重
-                    model_data["model_coff"][output_layer_name]["weight"] = param_data
+                    model_data["model_param"]["model_coff"][output_layer_name]["weight"] = param_data
                 else:  # 隐藏层权重
                     layer_index = int(name.split('.')[1])  # 索引修正
-                    model_data["model_coff"][f"bp_{layer_index + 1}_layer"]["weight"] = param_data
+                    model_data["model_param"]["model_coff"][f"bp_{layer_index + 1}_layer"]["weight"] = param_data
 
 
     # 写入 JSON 文件

@@ -14,6 +14,8 @@ def main():
         print("Error: Invalid JSON format in config.json. Please check the file.")
 
     # 获取配置
+    tooling_number = config['tooling_number']
+    print("Tooling Number:", tooling_number)
     dataDir = config['data_dir']
     print("Data Directory:", dataDir)
     select_files = config['select_files_or_not']
@@ -74,7 +76,10 @@ def main():
     mse = BPNN.test(model, X_test, y_test)
 
     # 保存参数
-    model_path = f"bpnn_param_{input_size}input_{output_size}output_{hidden_layer}hidden.json"
+    mapping_file = "./工位安装映射.json"
+    mapping_dict = load_mapping(mapping_file)
+    organization = mapping_dict.get(tooling_number)
+    model_path = f"./bpnn/bpnn_{tooling_number}_{organization}.json"
     metrics = {
         'MSE': mse,
     }
