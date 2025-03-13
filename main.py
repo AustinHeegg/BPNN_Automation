@@ -79,7 +79,7 @@ def main():
     mapping_file = "./工位安装映射.json"
     mapping_dict = load_mapping(mapping_file)
     organization = mapping_dict.get(tooling_number)
-    model_path = f"./bpnn/bpnn_{tooling_number}_{organization}.json"
+    model_path = f"./bpnn/bpnn_{organization}_{tooling_number}.json"
     metrics = {
         'MSE': mse,
     }

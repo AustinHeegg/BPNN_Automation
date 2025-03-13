@@ -16,13 +16,15 @@ class BPNN(nn.Module):
         self.activations = []
         self.fcs = nn.ModuleList()
 
-        self.fcs.append(nn.Linear(input_size, hidden_nodes[0]))
+        self.fc_input = nn.Identity()
         self.activations.append(self.get_activation(activation_functions[0]))
+        self.fcs.append(nn.Linear(input_size, hidden_nodes[0]))
+        self.activations.append(self.get_activation(activation_functions[1]))
         for i in range(1, hidden_layer):
             self.fcs.append(nn.Linear(hidden_nodes[i - 1], hidden_nodes[i]))
-            self.activations.append(self.get_activation(activation_functions[i]))
+            self.activations.append(self.get_activation(activation_functions[i + 1]))
         self.fc_out = nn.Linear(hidden_nodes[-1], output_size)
-        # self.activations.append(self.get_activation(activation_functions[-1]))
+        self.activations.append(self.get_activation(activation_functions[-1]))
 
         print(f"Activation function used: {activation_functions}")
 
@@ -34,6 +36,7 @@ class BPNN(nn.Module):
             "Leaky_ReLU": nn.LeakyReLU,
             "ELU": nn.ELU,
             "SELU": nn.SELU,
+            "Linear": nn.Identity()
         }
 
         if activation_function in activation_functions:
@@ -42,8 +45,10 @@ class BPNN(nn.Module):
             raise ValueError("Activation function is not supported!")
 
     def forward(self, x):
-        for i in range(self.hidden_layer):
-            x = self.activations[i](self.fcs[i](x))
+        x = self.fc_input(x)
+        x = self.activations[1](self.fcs[0](x))
+        for i in range(1, self.hidden_layer):
+            x = self.activations[i + 1](self.fcs[i](x))
         x = self.fc_out(x)
         return x
 
