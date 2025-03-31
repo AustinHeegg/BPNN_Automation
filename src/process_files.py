@@ -1,4 +1,5 @@
 import json
+import os
 import numpy as np
 import pandas as pd
 import torch
@@ -19,26 +20,18 @@ def getAllFfmData(files, selected_columns, rowSkip=1):
     data_arrays = [np.array(data) for data in data_lists]
     return data_arrays
 
+# 获取初始数据
+def getInitialData(selected_files, selected_columns, rowSkip):
+    # 读取初始数据并使用给定列
+    return getAllFfmData(selected_files, selected_columns, rowSkip)
 
 def prepare_data(data_files, batch_size, test_size, random_state, selected_input_columns, selected_output_columns,
-                 rowSkip):
+                 selected_input_columns_final, selected_output_columns_final, rowSkip):
     data_arrays = getAllFfmData(data_files, selected_input_columns + selected_output_columns, rowSkip)
 
     # 将训练和测试数据转换为张量
-    X = torch.tensor(np.column_stack([data_arrays[i] for i in selected_input_columns]).astype(np.float32))
-    y = torch.tensor(np.column_stack([data_arrays[i] for i in selected_output_columns]).astype(np.float32))
-
-    # np.set_printoptions(precision=15, floatmode="fixed")
-    # print("Input data (X_test):")
-    # for i in range(X.size(0)):  # 遍历行
-    #     inputs = (X[i, 0].item(), X[i, 1].item())  # 获取每行的两个输入
-    #     print(f"({inputs[0]:.15f}, {inputs[1]:.15f})")  # 格式化输出
-    #
-    # print("Output data (y_test):")
-    # for i in range(y.size(0)):  # 遍历行
-    #     outputs = (y[i, 0].item(), y[i, 1].item())  # 获取每行的两个输出
-    #     print(f"({outputs[0]:.15f}, {outputs[1]:.15f})")  # 格式化输出
-
+    X = torch.tensor(np.column_stack([data_arrays[i] for i in selected_input_columns_final]).astype(np.float32))
+    y = torch.tensor(np.column_stack([data_arrays[i] for i in selected_output_columns_final]).astype(np.float32))
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 

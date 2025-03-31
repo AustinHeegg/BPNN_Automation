@@ -68,7 +68,7 @@ def save_model_to_json(model, metrics=None, model_path=None, config=None):
     # 遍历模型的所有参数并填充模型权重和偏置
     for name, param in model.named_parameters():
         param_data = param.data.numpy().tolist()  # 转换为可序列化格式
-        print(f"Parameter name: {name}, Parameter value: {param.data.numpy()}")
+        # print(f"Parameter name: {name}, Parameter value: {param.data.numpy()}")
 
         if 'bias' in name:
             # 匹配层次
@@ -93,4 +93,4 @@ def save_model_to_json(model, metrics=None, model_path=None, config=None):
     with open(model_path, 'w') as json_file:
         json.dump(model_data, json_file, indent=4)
 
-    print(f"Model saved to {model_path}")
+    print(f"Model saved to {model_path}\n")
