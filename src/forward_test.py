@@ -11,7 +11,6 @@ class BPNeuralNetwork:
         return 1 / (1 + np.exp(-x))
 
     def forward_propagation(self, inputs):
-        """执行前向传播并返回输出层的结果."""
         # 输入层到输入层
         input_layer = inputs
         print("Input Layer is:", input_layer)
@@ -36,6 +35,7 @@ class BPNeuralNetwork:
 
 
 if __name__ == "__main__":
+    # 替换数据生成的weights
     weights = [
         np.array([
             [
@@ -259,6 +259,7 @@ if __name__ == "__main__":
         ])
     ]
 
+    # 替换数据生成的biases
     biases = [
         np.array([
                     0.5625599026679993,
@@ -296,7 +297,7 @@ if __name__ == "__main__":
                 ])
     ]
 
-    # 输入数据
+    # 替换输入数据
     input_data = np.array([
         [-2.601249, 2.772042],
         # [-0.25, -0.25],

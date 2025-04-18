@@ -1,5 +1,6 @@
 {
-  "select_files_or_not": 0,
+  "data_dir": "D:/Code/code-per/BP/data/A+B/221/Scanning",
+  "select_files_or_not": 1,
   "rowSkip": 1,
   "selected_input_columns": [7, 8],
   "selected_output_columns": [9, 10],
