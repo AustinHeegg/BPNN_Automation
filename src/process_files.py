@@ -65,26 +65,26 @@ def prepare_data(data_files, batch_size, test_size, random_state, selected_input
     return train_loader, test_loader, X_test, y_test
 
 
-def load_mapping(mapping_file):
-    try:
-        # 读取 JSON 文件
-        with open(mapping_file, 'r', encoding='utf-8') as file:
-            mapping_data = json.load(file)
-
-        # 检查数据格式是否为字典
-        if isinstance(mapping_data, dict):
-            mapping_dict = {value: key for key, value in mapping_data.items()}
-            return mapping_dict
-        else:
-            print("Error: JSON data is not a valid dictionary.")
-            return {}
-
-    except FileNotFoundError:
-        print(f"Error: {mapping_file} not found. Please check the file path.")
-        return {}
-    except json.JSONDecodeError:
-        print("Error: Failed to decode JSON.")
-        return {}
-    except Exception as e:
-        print(f"Error: An error occurred while loading the mapping file - {e}")
-        return {}
+# def load_mapping(mapping_file):
+#     try:
+#         # 读取 JSON 文件
+#         with open(mapping_file, 'r', encoding='utf-8') as file:
+#             mapping_data = json.load(file)
+#
+#         # 检查数据格式是否为字典
+#         if isinstance(mapping_data, dict):
+#             mapping_dict = {value: key for key, value in mapping_data.items()}
+#             return mapping_dict
+#         else:
+#             print("Error: JSON data is not a valid dictionary.")
+#             return {}
+#
+#     except FileNotFoundError:
+#         print(f"Error: {mapping_file} not found. Please check the file path.")
+#         return {}
+#     except json.JSONDecodeError:
+#         print("Error: Failed to decode JSON.")
+#         return {}
+#     except Exception as e:
+#         print(f"Error: An error occurred while loading the mapping file - {e}")
+#         return {}
